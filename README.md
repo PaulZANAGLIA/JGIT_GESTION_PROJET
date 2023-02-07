@@ -1,2 +1,4 @@
-# JGIT_GESTION_PROJET
-Projet scolaire 2022-2023
+# JGIT
+JGIT project (GP course 2022-2023)
+
+Very basic skeleton for a GIT-like tool in Java
