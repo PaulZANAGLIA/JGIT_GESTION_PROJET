@@ -33,7 +33,7 @@ public class TextFile implements Node {
     public void store() {
         try {
             String hash = hash();
-            FileOutputStream fos = new FileOutputStream(".git/objects/" + hash);
+            FileOutputStream fos = new FileOutputStream(".git/object/" + hash);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(this);
             oos.close();
@@ -46,7 +46,7 @@ public class TextFile implements Node {
     /** Loads the text file corresponding to the given hash (from file .git/object/[hash]). **/
     public static TextFile loadFile(String hash) {
         try {
-            FileInputStream fis = new FileInputStream(".git/objects/" + hash);
+            FileInputStream fis = new FileInputStream(".git/object/" + hash);
             ObjectInputStream ois = new ObjectInputStream(fis);
             TextFile textFile = (TextFile) ois.readObject();
             ois.close();
