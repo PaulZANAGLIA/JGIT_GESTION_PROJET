@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Folder implements Node {
+public class Folder implements Node, Serializable {
     // Mapping Name -> Node
     private Map<String, Node> children;
 
@@ -31,12 +31,13 @@ public class Folder implements Node {
         return sb.toString();
     }
 
-    /** Stores the corresponding object in .git directory (file .git/object/[hash]) **/
+    /** Stores the corresponding object in .git directory (file .jgit/object/[hash]) **/
     @Override
     public void store() {
         try {
             String hash = hash();
-            FileOutputStream fos = new FileOutputStream(".git/objects/" + hash);
+            FileOutputStream fos = new FileOutputStream(".jgit/objects/" + hash);
+            System.out.println(".jgit/objects/" + hash + " created");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(this);
             oos.close();
@@ -60,7 +61,7 @@ public class Folder implements Node {
     /** Loads the folder corresponding to the given hash (from file .git/object/[hash]). **/
     public static Folder loadFolder(String hash) {
         try {
-            FileInputStream fis = new FileInputStream(".git/objects/" + hash);
+            FileInputStream fis = new FileInputStream(".jgit/objects/" + hash);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Folder folder = (Folder) ois.readObject();
             ois.close();

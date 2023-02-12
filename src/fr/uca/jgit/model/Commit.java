@@ -39,7 +39,7 @@ public class Commit implements JGitObject {
     public void store() {
         try {
             String hash = hash();
-            FileOutputStream fos = new FileOutputStream(".git/logs/" + hash);
+            FileOutputStream fos = new FileOutputStream(".jgit/logs/" + hash);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(this);
             oos.close();
@@ -51,7 +51,7 @@ public class Commit implements JGitObject {
 
     public static Commit loadCommit(String hash) {
         try {
-            FileInputStream fis = new FileInputStream(".git/logs/" + hash);
+            FileInputStream fis = new FileInputStream(".jgit/logs/" + hash);
             ObjectInputStream ois = new ObjectInputStream(fis);
             Commit commit = (Commit) ois.readObject();
             ois.close();
