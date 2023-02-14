@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 
+
 public class Folder implements Node, Serializable {
     // Mapping Name -> Node
     private Map<String, Node> children;

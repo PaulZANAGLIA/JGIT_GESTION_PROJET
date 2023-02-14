@@ -16,6 +16,8 @@ public class Main {
             File fh = new File(".jgit/HEAD.txt");
             if (fo.mkdirs() && fh.mkdirs() && fl.mkdirs()) {
                 System.out.println("Directory created ");
+            } else {
+                System.out.println("Directory already created");
             }
         }
     }
