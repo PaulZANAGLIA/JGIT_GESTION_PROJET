@@ -11,9 +11,10 @@ public class Main {
 	// write your code here
         System.out.println(Arrays.toString(args));
         if (args[0].equals("init")){
-            File fo = new File(".jgit/object");
-            File fh = new File(".jgit/HEAD");
-            if (fo.mkdirs() && fh.mkdirs()) {
+            File fo = new File(".jgit/objects");
+            File fl = new File(".jgit/logs");
+            File fh = new File(".jgit/HEAD.txt");
+            if (fo.mkdirs() && fh.mkdirs() && fl.mkdirs()) {
                 System.out.println("Directory created ");
             }
         }
