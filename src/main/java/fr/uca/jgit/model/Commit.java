@@ -1,10 +1,5 @@
 package fr.uca.jgit.model;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.security.MessageDigest;
 import java.util.List;
 
@@ -39,11 +34,11 @@ public class Commit implements JGitObject {
     public void store() {
         try {
             String hash = hash();
-            FileOutputStream fos = new FileOutputStream(".jgit/logs/" + hash);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(this);
-            oos.close();
-            fos.close();
+            File commitFile = new File(".jgit/logs/"+hash);
+            if (commitFile.createNewFile()){
+                FileWriter fw = new FileWriter(".jgit/logs"+hash);
+                //fw.write();
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -33,11 +33,10 @@ public class TextFile implements Node {
     public void store() {
         try {
             String hash = hash();
-            FileOutputStream fos = new FileOutputStream(".jgit/object/" + hash);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(this);
-            oos.close();
-            fos.close();
+            File file = new File(".jgit/objects/" + hash);
+            FileWriter fw = new FileWriter(file);
+            fw.write(content);
+            fw.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
