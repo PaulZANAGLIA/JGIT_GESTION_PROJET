@@ -1,95 +1,76 @@
 package fr.uca.jgit.model;
 
-import java.io.*;
-import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.util.*;
 
-
-public class Folder implements Node, Serializable {
+public class Folder implements Node {
     // Mapping Name -> Node
-    private Map<String, Node> children;
+    final Map<String, Node> children;
+
+    public Map<String, Node> getChildren() {
+        return children;
+    }
 
     public Folder() {
-        children = new HashMap<>();
+        this.children = new HashMap<>();
     }
 
-    @Override
-    public String hash() {
-        StringBuffer sb = new StringBuffer();
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            for (Node child : children.values()) {
-                md.update(child.hash().getBytes());
-            }
-            byte[] bytes = md.digest();
-            for (int i = 0; i < bytes.length; i++) {
-                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
-    }
-
-    /** Stores the corresponding object in .git directory (file .jgit/object/[hash]) **/
+    /** Stores the corresponding object in .git directory (file .git/object/[hash]) **/
     @Override
     public void store() {
-        try {
-            String hash = hash();
-            FileOutputStream fos = new FileOutputStream(".jgit/objects/" + hash);
-            System.out.println(".jgit/objects/" + hash + " created");
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(this);
-            oos.close();
-            fos.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        for (Node child : children.values()) {
+            child.store();
         }
+        // Store folder
+        Utils.store(this);
     }
 
     /** Return a list representation of the folder (see doc) **/
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        List<String> lines = new ArrayList<>();
         for (Map.Entry<String, Node> entry : children.entrySet()) {
-            sb.append(entry.getKey());
-            sb.append("\n");
+            String name = entry.getKey();
+            Node child = entry.getValue();
+            String type = child instanceof TextFile ? "t" : "d";
+            lines.add(name + ";" + type + ";" + child.hash());
         }
-        return sb.toString();
+        return String.join("\n", lines);
     }
 
     /** Loads the folder corresponding to the given hash (from file .git/object/[hash]). **/
     public static Folder loadFolder(String hash) {
-        try {
-            FileInputStream fis = new FileInputStream(".jgit/objects/" + hash);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            Folder folder = (Folder) ois.readObject();
-            ois.close();
-            fis.close();
-            return folder;
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        String contents = Utils.loadObjFile(hash);
+        Folder folder = new Folder();
+        if (!"".equals(contents)) {
+            String[] lines = contents.split("\n");
+            for (String line : lines) {
+                String[] parts = line.split(";");
+                String name = parts[0];
+                String type = parts[1];
+                String childHash = parts[2];
+                Node child = type.equals("t") ? TextFile.loadFile(childHash) :
+                        Folder.loadFolder(childHash);
+                folder.getChildren().put(name, child);
+            }
         }
+        return folder;
     }
 
     /** Restores the file node at the given path. **/
     @Override
     public void restore(String path) {
-        File folder = new File(path);
-        folder.mkdirs();
+        File folderDir = new File(path);
+        if (!folderDir.exists()) {
+            if (!folderDir.mkdirs()) {
+                throw new RuntimeException("IO Error : Unable to create directory " + path);
+            }
+        }
         for (Map.Entry<String, Node> entry : children.entrySet()) {
-            String childPath = path + "/" + entry.getKey();
-            entry.getValue().restore(childPath);
+            String name = entry.getKey();
+            Node child = entry.getValue();
+            String childPath = path + "/" + name;
+            child.restore(childPath);
         }
     }
-
-    public void addChild(String name, Node child) {
-        children.put(name, child);
-    }
-
-    public Map<String, Node> getChildren() {
-        return children;
-    }
 }
-
