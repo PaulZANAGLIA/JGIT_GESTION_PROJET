@@ -12,7 +12,7 @@ public class Utils {
     /**Computes the hash of a Node based on its content. **/
     static public String hash(String content) {
         try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            MessageDigest digest = MessageDigest.getInstance("MD5");
             byte[] hashBytes = digest.digest(content.getBytes());
             StringBuilder hash = new StringBuilder();
             for (byte b : hashBytes) {
@@ -20,7 +20,7 @@ public class Utils {
             }
             return hash.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("No SHA1 algorithm");
+            throw new RuntimeException("No MD5 algorithm");
         }
     }
 
